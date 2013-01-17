@@ -18,3 +18,9 @@ to do
 * plugins - things like bugzilla links and 'what links here'
 * check this works on Windows - i've put in directory creation for notes with a "/" in the title.  not sure if Windows needs something similar.
 * turn this "to do" list into github "Issues" ;-)
+* alternative CSS styles?
+
+notes
+=====
+there's a note-to-html stylesheet in the Tomboy source: http://git.gnome.org/browse/tomboy/tree/data/tomboy-note-clipboard-html.xsl
+but it doesn't appear to work in a browser.  i think it's a namespaces issue.  might be worth just adding namespaces to it - perhaps we can make a version which works here AND in the app.
