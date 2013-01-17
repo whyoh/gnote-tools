@@ -24,3 +24,5 @@ notes
 =====
 there's a note-to-html stylesheet in the Tomboy source: http://git.gnome.org/browse/tomboy/tree/data/tomboy-note-clipboard-html.xsl
 but it doesn't appear to work in a browser.  i think it's a namespaces issue.  might be worth just adding namespaces to it - perhaps we can make a version which works here AND in the app.
+
+Tomboy appears to have a "--addin:html-export-all-quit [path]" option but that seems to be missing in gnote.  I think i prefer the XSL reference approach but could be persuaded.
