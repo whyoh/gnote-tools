@@ -6,7 +6,10 @@ from lxml import etree
 from os import makedirs
 from os.path import exists
 
-tomboy = dbus.Interface(dbus.SessionBus().get_object("org.gnome.Gnote", "/org/gnome/Gnote/RemoteControl"), "org.gnome.Gnote.RemoteControl")  
+try:
+	tomboy = dbus.Interface(dbus.SessionBus().get_object("org.gnome.Tomboy", "/org/gnome/Tomboy/RemoteControl"), "org.gnome.Tomboy.RemoteControl")	
+except:
+	tomboy = dbus.Interface(dbus.SessionBus().get_object("org.gnome.Gnote", "/org/gnome/Gnote/RemoteControl"), "org.gnome.Gnote.RemoteControl")	
 for uri in tomboy.ListAllNotes() :
 	title = tomboy.GetNoteTitle(uri)
 	if "/" in title:
