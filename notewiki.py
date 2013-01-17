@@ -16,4 +16,4 @@ for uri in tomboy.ListAllNotes() :
 		folder = "/".join(title.split("/")[:-1])
 		if not exists(folder): makedirs(folder)
 	open(title + ".xml", "w").write("﻿<?xml version='1.0' encoding='utf-8'?>\n<?xml-stylesheet href='note-html.xsl' type='text/xsl'?>\n" + 
-etree.tostring(etree.fromstring(tomboy.GetNoteCompleteXml(uri))))
+etree.tostring(etree.fromstring(tomboy.GetNoteCompleteXml(uri)), encoding="utf-8"))
