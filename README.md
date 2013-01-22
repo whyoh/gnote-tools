@@ -15,7 +15,7 @@ to do
 =====
 * the note metadata could use some love - see comments in XSLT
 * notebooks
-* indents
+* indents and tabs
 * plugins - things like bugzilla links and 'what links here'
 * check this works on Windows - i've put in directory creation for notes with a "/" in the title.  not sure if Windows needs something similar.
 * turn this "to do" list into github "Issues" ;-)
