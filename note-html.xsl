@@ -89,7 +89,7 @@
 
 	<!-- deal with links and formatting -->
 	<xsl:template match="*[namespace-uri() = 'http://beatniksoftware.com/tomboy/link']">
-		<a><xsl:attribute name='href'><xsl:value-of select='.'/><xsl:if test='local-name() != "url"'><xsl:value-of select='".xml"'/></xsl:if></xsl:attribute><xsl:attribute name='class'><xsl:value-of select='local-name()'/></xsl:attribute><xsl:value-of select='.'/></a>
+		<a><xsl:attribute name='href'><xsl:value-of select='.'/><xsl:if test='local-name() != "url"'><xsl:value-of select='".xml"'/></xsl:if></xsl:attribute><xsl:attribute name='class'><xsl:value-of select='local-name()'/></xsl:attribute><xsl:apply-templates select="@*|node()"/></a>
 	</xsl:template>
 
 	<xsl:template match="*[(local-name() = 'bold' or local-name() = 'italic' or local-name() = 'strikethrough') and namespace-uri() = 'http://beatniksoftware.com/tomboy']">
