@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <!-- start with an identity - should be able to remove this eventually -->
+<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz-'" />
+<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ/'" />
+
+	<!-- start with an identity - should be able to remove this eventually -->
 	<xsl:template match="@*|node()">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"/>
@@ -35,6 +38,7 @@
     		color: #444;
     		background: white;
     		padding: 20px;
+    		margin-bottom: 10px;
     	}
     	.small {
     		font-size: 75%;
@@ -61,7 +65,7 @@
     		color: #888;
     		font-size: 75%;
     		font-style: italic;
-    		display: none;
+			text-align: right;
     	}
     	.fieldname {
     		font-weight: bold;
@@ -89,7 +93,7 @@
 
 	<!-- deal with links and formatting -->
 	<xsl:template match="*[namespace-uri() = 'http://beatniksoftware.com/tomboy/link']">
-		<a><xsl:attribute name='href'><xsl:value-of select='.'/><xsl:if test='local-name() != "url"'><xsl:value-of select='".xml"'/></xsl:if></xsl:attribute><xsl:attribute name='class'><xsl:value-of select='local-name()'/></xsl:attribute><xsl:apply-templates select="@*|node()"/></a>
+		<a><xsl:attribute name='href'><xsl:choose><xsl:when test='local-name() != "url"'><xsl:value-of select='concat(translate(., $uppercase, $lowercase), ".xml")'/></xsl:when><xsl:otherwise><xsl:value-of select='.'/></xsl:otherwise></xsl:choose></xsl:attribute><xsl:attribute name='class'><xsl:value-of select='local-name()'/></xsl:attribute><xsl:apply-templates select="@*|node()"/></a>
 	</xsl:template>
 
 	<xsl:template match="*[(local-name() = 'bold' or local-name() = 'italic' or local-name() = 'strikethrough') and namespace-uri() = 'http://beatniksoftware.com/tomboy']">
