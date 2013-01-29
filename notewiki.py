@@ -178,9 +178,9 @@ for note in noteList:
 	elif options.mode == "check": updated.append(note)
 
 # print a summary
-if options.mode == "export" and not options.test and topLevelList: open("index.html", "w").write("\n".join("<a href='" + x.replace("/", "-") + ".xml'>" + x + "</a></li>" for x in sorted(topLevelList.keys())))
+if options.mode == "export" and not options.diff and topLevelList: open("index.html", "w").write("\n".join("<li><a href='" + x.replace("/", "-") + ".xml'>" + x for x in sorted(topLevelList.keys())))
 if totalErrors: print totalErrors, "error(s) in", len(hasErrors), "note(s)"
 if totalWarnings and options.verbose: print totalWarnings, "warning(s) in", len(hasWarnings), "note(s)"
 if updated: print len(updated), "note(s) updated"
 if options.mode == "overwrite" and updated: print "now log out to force re-reading of the files"
-if options.mode in ("dbus", "overwrite", "check") and not updated: print "all clear!"
+if options.mode != "export" and not updated: print "all clear!"
