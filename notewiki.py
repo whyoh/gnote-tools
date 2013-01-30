@@ -12,11 +12,10 @@ from argparse import ArgumentParser
 from etreeEditor import etreeEditor
 
 argParser = ArgumentParser()
-argParser.add_argument("-m", "--mode", help = "check notes (default), overwrite .note files or export to .xml files", choices = ['check', 'overwrite', 'export'], default="check")
+argParser.add_argument("-m", "--mode", help = "check notes (default), overwrite .note files, export to .xml files or write to files in 'orig' and 'fixed' subfolders", choices = ['check', 'overwrite', 'export', 'diff'], default="check")
 argParser.add_argument("-i", "--include", help = "note title to include - repeat option to specify more than one note", action = "append")
 argParser.add_argument("-v", "--verbose", help = "write a bunch of stuff to stdout", action = "store_true")
-argParser.add_argument("-d", "--diff", help = "try to make 'original' and 'fixed' output files easy to diff", action = "store_true")
-argParser.add_argument("-g", "--good", help = "include 'clean' files (implied by 'export' mode)", action = "store_true")
+argParser.add_argument("-a", "--all", help = "include 'clean' files (implied by 'export' mode)", action = "store_true")
 argParser.add_argument("-s", "--style", help = "include a reference to an XML stylesheet")
 options = argParser.parse_args()
 
@@ -72,12 +71,8 @@ def checkLinks(foundTitles, links, brokenLinks):
 						linkOkay = True
 						if styleDex >= len(links): anyBroken = True
 					elif any(thisLink): splitLink = True
-			if linkOkay and anyBroken:
-				if options.mode != "export": warnings.append("  not broken: " + title)
-				else: errors.append("  not broken: " + title)
-			if linkOkay and splitLink:
-				if options.mode != "export": warnings.append("  split link: " + title)
-				else: errors.append("  split link: " + title)
+			if linkOkay and anyBroken: warnings.append("  not broken: " + title)
+			if linkOkay and splitLink: warnings.append("  split link: " + title)
 			if not linkOkay: errors.append("  BROKEN!: " + title)
 	for x in list(n for n, x in enumerate(links + brokenLinks) if n not in matchedLinks):
 		if x >= len(links): warnings.append("  broken link lost")
@@ -143,8 +138,8 @@ for note in noteList:
 	totalErrors += len(errors)
 	totalWarnings += len(warnings)
 
-	if not errors and  options.mode != "export" and not options.good: continue
-	# if there's anything to fix (or we're exporting everything regardless)...
+	# skip 'clean' notes unless we're doing an export or have asked for all
+	if not errors and  options.mode != "export" and not options.all: continue
 	
 	# add internal links back in
 	for link in foundTitles: fixer.add("{http://beatniksoftware.com/tomboy/link}internal", link[1] + noteRange[0], link[2] + noteRange[0])
@@ -159,16 +154,18 @@ for note in noteList:
 
 	elif options.mode == "export":
 		notefile = note.replace("/", "-").replace(":", "-") + ".xml"
-		if options.diff: # try to match output to the app-generated XML so it's easier to check diffs
-			if not os.path.exists("fixed"): makedirs("fixed")
-			if not os.path.exists("orig"): makedirs("orig")
-			open("fixed/" + notefile, "w").write((u'<?xml version="1.0"?>\n' + fixer.serialize().replace(u'<note xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy" version="0.3">', u'<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">').replace(u'<note-content version="0.1">', u'<note-content version="0.1" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size">') + u"\n\n").encode("utf-8"))
-			open("orig/" + notefile, "w").write(tomboy.GetNoteCompleteXml(noteList[note]).encode("utf-8").replace("&quot;", "\""))
-		else:
-			if options.style:
-				prefix = "﻿<?xml version='1.0' encoding='utf-8'?>\n<?xml-stylesheet href='" + options.style + "' type='text/xsl'?>\n"
-			else: prefix = ""
-			open(notefile, "w").write(prefix + fixer.serialize(encoding="utf-8"))
+		if options.style:
+			prefix = "﻿<?xml version='1.0' encoding='utf-8'?>\n<?xml-stylesheet href='" + options.style + "' type='text/xsl'?>\n"
+		else: prefix = ""
+		open(notefile, "w").write(prefix + fixer.serialize(encoding="utf-8"))
+
+	elif options.mode == "diff":
+		notefile = note.replace("/", "-").replace(":", "-") + ".xml"
+		if not os.path.exists("fixed"): makedirs("fixed")
+		if not os.path.exists("orig"): makedirs("orig")
+		# try to make a matched pair of files based on current (gnote 0.8.3) version
+		open("fixed/" + notefile, "w").write((u'<?xml version="1.0"?>\n' + fixer.serialize().replace(u'<note xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy" version="0.3">', u'<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">').replace(u'<note-content version="0.1">', u'<note-content version="0.1" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size">') + u"\n\n").encode("utf-8"))
+		open("orig/" + notefile, "w").write(tomboy.GetNoteCompleteXml(noteList[note]).encode("utf-8").replace("&quot;", "\""))
 
 	elif options.mode == "dbus":
 		# only the last one of these calls seems to have any effect - and it updates the 'last changed' date in the note .. not what i wanted.  back to modifying the XML files directly :-(
@@ -177,7 +174,9 @@ for note in noteList:
 		else: updated.append(note)
 	elif options.mode == "check": updated.append(note)
 # print a summary
-if options.mode == "export" and not options.diff and topLevelList: open("index.html", "w").write("\n".join("<li><a href='" + x.replace("/", "-").replace("'", "&apos;").replace(":", "-") + ".xml'>" + x for x in sorted(topLevelList.keys())))
+if options.mode == "export" and topLevelList:
+	indexNote = prefix + '<note xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy" version="0.3"><title>Index</title><text xml:space="preserve"><note-content version="0.1">Index\n' + "\n".join("<link:internal>" + x.encode("utf-8") + "</link:internal>" for x in sorted(topLevelList.keys())) + "</note-content></text><tags><tag>export:index</tag></tags></note>"
+	open("exportIndex.xml", "w").write(indexNote)
 if totalErrors: print totalErrors, "error(s) in", len(hasErrors), "note(s)"
 if totalWarnings and options.verbose: print totalWarnings, "warning(s) in", len(hasWarnings), "note(s)"
 if updated: print len(updated), "note(s) updated"
