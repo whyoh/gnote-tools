@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz-'" />
-<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ/'" />
+<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz--'" />
+<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ/:'" />
 
 	<!-- start with an identity - should be able to remove this eventually -->
 	<xsl:template match="@*|node()">
@@ -71,6 +71,18 @@
     		font-weight: bold;
     		margin-right: 5px;
     	}
+    	ul.field {
+    		margin: 6px 0;
+    	}
+    	li.tag {
+    		display: inline;
+    		margin-left: 3px;
+    		padding: 4px;
+    		border: 2px solid yellow;
+    		background: orange;
+    		border-radius: 8px;
+    		box-shadow: 0 1px 2px grey;
+    	}
     </style>
    </head><body>
 	<xsl:apply-templates select="*"/>
@@ -113,8 +125,19 @@
 	</xsl:template>
 
 	<!-- note metadata - FIXME would be nice to replace this with an 'everything else' match, put them all in a div and have a show/hide button for it -->
-	<xsl:template match="*[(local-name() = 'last-change-date' or local-name() = 'last-metadata-change-date' or local-name() = 'create-date' or local-name() = 'cursor-position' or local-name() = 'selection-bound-position' or local-name() = 'width' or local-name() = 'height' or local-name() = 'x' or local-name() = 'y' or local-name() = 'open-on-startup') and namespace-uri() = 'http://beatniksoftware.com/tomboy']">
+	<xsl:template match="*[(local-name() = 'last-change-date' or local-name() = 'create-date') and namespace-uri() = 'http://beatniksoftware.com/tomboy']">
 		<div class='field'><span class='fieldname'><xsl:value-of select='local-name()'/></span><xsl:value-of select='.'/></div>
+	</xsl:template>
+
+	<xsl:template match="*[(local-name() = 'last-metadata-change-date' or local-name() = 'cursor-position' or local-name() = 'selection-bound-position' or local-name() = 'width' or local-name() = 'height' or local-name() = 'x' or local-name() = 'y' or local-name() = 'open-on-startup') and namespace-uri() = 'http://beatniksoftware.com/tomboy']">
+	</xsl:template>
+
+	<xsl:template match="*[local-name() = 'tags' and namespace-uri() = 'http://beatniksoftware.com/tomboy']">
+		<ul class='field'><xsl:apply-templates select="@*|node()"/></ul>
+	</xsl:template>
+
+	<xsl:template match="*[local-name() = 'tag' and namespace-uri() = 'http://beatniksoftware.com/tomboy']">
+		<li class='tag'><xsl:value-of select='.'/></li>
 	</xsl:template>
 
 </xsl:transform>
