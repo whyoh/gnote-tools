@@ -2,8 +2,9 @@ gnote-tools
 ===========
 tools for dealing with tomboy/gnote notes, either via dbus or directly on the XML (*.note) files
 
-usage
------
+usage 1
+-------
+to export all notes to a set of web pages:
 1. create a new directory and cd to it
 2. run notewiki.py -m export -s note-html.xsl.  it will connect to your tomboy or gnote notes via dbus and save them all as XML files in the current directory, named according to their titles and including a reference to the note-html.xsl XSLT stylesheet.
 3. put the note-html.xsl file in the same directory.
@@ -14,7 +15,8 @@ usage 2
 in gnote 0.8.3 i have trouble with note titles which contain spaces and start with the name of another note - the automatic links get messed up.
 also gnote sometimes convinces itself that a link is broken when it isn't.
 also text in old notes doesn't automatically link to new notes.
-all these things can be fixed by running notewiki.py -m overwrite.
+to fix all these things:
+1. run notewiki.py -m overwrite.
 
 to do
 -----
