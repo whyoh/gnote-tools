@@ -77,7 +77,7 @@
     	li.tag {
     		display: inline;
     		margin-left: 3px;
-    		padding: 4px;
+    		padding: 3px 7px;
     		border: 2px solid yellow;
     		background: orange;
     		border-radius: 8px;
