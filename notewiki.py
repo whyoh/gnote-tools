@@ -104,7 +104,7 @@ while not gotNotes and sleeps < 10:
 			if title: noteList[title] = uri
 		gotNotes = True
 	except:
-		print app + " not ready.  waiting up to ten seconds for it to become ready."
+		print app, "not ready.  waiting up to", 10 - sleeps, "seconds for it to become ready."
 		sleep(1)
 		sleeps += 1
 if not gotNotes:
