@@ -29,7 +29,7 @@ to do
 * notebooks
 * indents and tabs
 * plugins - things like bugzilla links and 'what links here'
-* check this works on Windows - i've put in directory creation for notes with a "/" in the title.  not sure if Windows needs something similar.
+* check this works on Windows.
 * turn this "to do" list into github "Issues" ;-)
 * alternative CSS styles?
 
