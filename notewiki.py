@@ -8,6 +8,8 @@ from string import whitespace, punctuation, ascii_letters, digits
 import os.path
 from os import makedirs
 from argparse import ArgumentParser
+from time import sleep
+from sys import exit
 
 from etreeEditor import etreeEditor
 
@@ -79,19 +81,35 @@ def checkLinks(foundTitles, links, brokenLinks):
 		else: warnings.append("  link lost")
 	return errors, warnings
 
-# connect to whichever dbus interface exists
+# connect to whichever dbus interface is installed
 try:
 	tomboy = dbus.Interface(dbus.SessionBus().get_object("org.gnome.Tomboy", "/org/gnome/Tomboy/RemoteControl"), "org.gnome.Tomboy.RemoteControl")
 	app = "tomboy"
 except:
-	tomboy = dbus.Interface(dbus.SessionBus().get_object("org.gnome.Gnote", "/org/gnome/Gnote/RemoteControl"), "org.gnome.Gnote.RemoteControl")	
-	app = "gnote"
+	try:
+		tomboy = dbus.Interface(dbus.SessionBus().get_object("org.gnome.Gnote", "/org/gnome/Gnote/RemoteControl"), "org.gnome.Gnote.RemoteControl")	
+		app = "gnote"
+	except:
+		print "either tomboy or gnote must be installed."
+		exit(1)
 
 # fetch the note list
 noteList = {}
-for uri in tomboy.ListAllNotes():
-	title = tomboy.GetNoteTitle(uri).lower()
-	if title: noteList[title] = uri
+gotNotes = False
+sleeps = 0
+while not gotNotes and sleeps < 10:
+	try:
+		for uri in tomboy.ListAllNotes():
+			title = tomboy.GetNoteTitle(uri).lower()
+			if title: noteList[title] = uri
+		gotNotes = True
+	except:
+		print app + " not ready.  waiting up to ten seconds for it to become ready."
+		sleep(1)
+		sleeps += 1
+if not gotNotes:
+	print "could not fetch notes from " + app
+	exit(1)
 print "found", len(noteList), "note(s)"
 
 titleList = sorted(noteList.keys(), cmp=lambda x, y: len(y) - len(x))
