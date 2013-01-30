@@ -158,7 +158,7 @@ for note in noteList:
 		updated.append(note)
 
 	elif options.mode == "export":
-		notefile = note.replace("/", "-") + ".xml"
+		notefile = note.replace("/", "-").replace(":", "-") + ".xml"
 		if options.diff: # try to match output to the app-generated XML so it's easier to check diffs
 			if not os.path.exists("fixed"): makedirs("fixed")
 			if not os.path.exists("orig"): makedirs("orig")
@@ -176,9 +176,8 @@ for note in noteList:
 			print "failed to update note", note
 		else: updated.append(note)
 	elif options.mode == "check": updated.append(note)
-
 # print a summary
-if options.mode == "export" and not options.diff and topLevelList: open("index.html", "w").write("\n".join("<li><a href='" + x.replace("/", "-") + ".xml'>" + x for x in sorted(topLevelList.keys())))
+if options.mode == "export" and not options.diff and topLevelList: open("index.html", "w").write("\n".join("<li><a href='" + x.replace("/", "-").replace("'", "&apos;").replace(":", "-") + ".xml'>" + x for x in sorted(topLevelList.keys())))
 if totalErrors: print totalErrors, "error(s) in", len(hasErrors), "note(s)"
 if totalWarnings and options.verbose: print totalWarnings, "warning(s) in", len(hasWarnings), "note(s)"
 if updated: print len(updated), "note(s) updated"
