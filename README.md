@@ -9,7 +9,7 @@ usage
 1. create a new directory and cd to it
 2. run notewiki.py -m export -s note-html.xsl.  it will connect to your tomboy or gnote notes via dbus and save them all as XML files in the current directory, named according to their titles and including a reference to the note-html.xsl XSLT stylesheet.
 3. put the note-html.xsl file in the same directory.
-4. now open either the folder or one of the XML files (perhaps your 'Start Here' note) in a web browser.
+4. now open either the folder or one of the XML files (perhaps your 'Start Here' note or the generated exportIndex.xml file) in a web browser.
 
 to do
 =====
